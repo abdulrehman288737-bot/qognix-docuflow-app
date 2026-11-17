@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Midnight Navy + Electric Violet (same branding as the website) -->
+    <color name="navy">#0B1020</color>
+    <color name="navy_card">#19233D</color>
+    <color name="violet">#7657FF</color>
+    <color name="violet_light">#A78BFA</color>
+    <color name="text_primary">#F8FAFC</color>
+    <color name="text_secondary">#A7B0C3</color>
+    <color name="white">#FFFFFF</color>
+</resources>
+</atem:invoke>
+</atem:function_calls>

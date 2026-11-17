@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Qognix DocuFlow</string>
+    <string name="offline_title">No internet connection</string>
+    <string name="offline_message">Qognix DocuFlow needs the internet to open your study tools. Please check your Wi-Fi or mobile data, then tap Retry.</string>
+    <string name="retry">Retry</string>
+</resources>
