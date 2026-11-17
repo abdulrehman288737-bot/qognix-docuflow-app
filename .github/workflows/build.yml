@@ -29,11 +29,14 @@ jobs:
           distribution: temurin
           java-version: '17'
 
-      - name: Set up Android SDK
-        uses: android-actions/setup-android@v3
-
+      # NOTE: GitHub's ubuntu runners already include the Android SDK and
+      # sdkmanager. The android-actions/setup-android step was removed
+      # (2026-11-17) because it tried to install the obsolete 'tools'
+      # package, which no longer exists and failed the whole build.
       - name: Install SDK Platform 36 and Build Tools
-        run: sdkmanager "platforms;android-36" "build-tools;36.0.0"
+        run: |
+          yes | sdkmanager --licenses > /dev/null
+          sdkmanager "platforms;android-36" "build-tools;36.0.0"
 
       - name: Decode release keystore (only if secret exists)
         env:
