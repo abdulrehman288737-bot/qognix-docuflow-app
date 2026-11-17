@@ -1,0 +1,5 @@
+// Top-level build file. Versions match the toolchain used for the user's
+// other app project (Gradle 9.7, Android Gradle Plugin 9.3.1, JDK 17).
+plugins {
+    id 'com.android.application' version '9.3.1' apply false
+}
