@@ -29,14 +29,16 @@ jobs:
           distribution: temurin
           java-version: '17'
 
-      # NOTE: GitHub's ubuntu runners already include the Android SDK and
-      # sdkmanager. The android-actions/setup-android step was removed
-      # (2026-11-17) because it tried to install the obsolete 'tools'
-      # package, which no longer exists and failed the whole build.
+      # NOTE: The android-actions/setup-android step was removed (2026-11-17)
+      # because it tried to install the obsolete 'tools' package. The runner
+      # image does include the Android SDK, but sdkmanager is NOT on PATH,
+      # so it is located under $ANDROID_HOME and called by its full path.
       - name: Install SDK Platform 36 and Build Tools
         run: |
-          yes | sdkmanager --licenses > /dev/null
-          sdkmanager "platforms;android-36" "build-tools;36.0.0"
+          SDKMANAGER="$(find "$ANDROID_HOME/cmdline-tools" -name sdkmanager -type f | sort -V | tail -1)"
+          echo "Using sdkmanager at: $SDKMANAGER"
+          yes | "$SDKMANAGER" --licenses > /dev/null
+          "$SDKMANAGER" "platforms;android-36" "build-tools;36.0.0"
 
       - name: Decode release keystore (only if secret exists)
         env:
