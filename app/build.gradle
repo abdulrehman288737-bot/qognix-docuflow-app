@@ -1,0 +1,75 @@
+plugins {
+    id 'com.android.application'
+}
+
+// ---------------------------------------------------------------------------
+// Optional release signing.
+// The build stays unsigned unless you provide signing details, in ONE of
+// these two ways (used by the GitHub Actions workflow):
+//   1. A file named keystore.properties in the project root, OR
+//   2. Environment variables: KEYSTORE_FILE, KEYSTORE_PASSWORD,
+//      KEY_ALIAS, KEY_PASSWORD
+// The keystore file itself lives OUTSIDE this project (qognix-app/keystore/)
+// and must never be uploaded to GitHub as a normal file.
+// ---------------------------------------------------------------------------
+def keystorePropsFile = rootProject.file("keystore.properties")
+def keystoreProps = new Properties()
+if (keystorePropsFile.exists()) {
+    keystoreProps.load(new FileInputStream(keystorePropsFile))
+}
+def ksFile = keystoreProps.getProperty("storeFile") ?: System.getenv("KEYSTORE_FILE")
+def ksPass = keystoreProps.getProperty("storePassword") ?: System.getenv("KEYSTORE_PASSWORD")
+def kAlias = keystoreProps.getProperty("keyAlias") ?: System.getenv("KEY_ALIAS")
+def kPass  = keystoreProps.getProperty("keyPassword") ?: System.getenv("KEY_PASSWORD")
+def hasSigning = ksFile != null && ksPass != null && kAlias != null && kPass != null
+
+android {
+    namespace 'com.qognix.docuflow'
+    compileSdk 36
+
+    defaultConfig {
+        applicationId "com.qognix.docuflow"
+        minSdk 24
+        targetSdk 36
+        versionCode 1
+        versionName "1.0"
+    }
+
+    signingConfigs {
+        if (hasSigning) {
+            release {
+                storeFile file(ksFile)
+                storePassword ksPass
+                keyAlias kAlias
+                keyPassword kPass
+            }
+        }
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            shrinkResources false
+            if (hasSigning) {
+                signingConfig signingConfigs.release
+            }
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+        debug {
+            minifyEnabled false
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+}
+
+dependencies {
+    // Pull-to-refresh container only (the app itself is a WebView shell).
+    // NOTE (user decision, 2026-11-17): NO AdMob / Google Mobile Ads SDK.
+    // The only ads in this app are the website's own Adsterra banner ads,
+    // which load inside the WebView as part of the website itself.
+    implementation 'androidx.swiperefreshlayout:swiperefreshlayout:1.1.0'
+}
