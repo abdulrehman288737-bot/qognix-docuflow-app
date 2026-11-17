@@ -52,6 +52,11 @@ jobs:
             echo "Release signing: OFF (no keystore secret) - release APK will be unsigned"
           fi
 
+      # Files uploaded through GitHub's web uploader lose the executable
+      # bit, so gradlew must be made executable before it can run.
+      - name: Make gradlew executable
+        run: chmod +x gradlew
+
       - name: Build debug APK (installable for testing)
         run: ./gradlew assembleDebug --stacktrace
 
