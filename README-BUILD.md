@@ -1,10 +1,10 @@
-# Qognix DocuFlow — Native App v2.1 (APK banane ke steps)
+# Qognix DocuFlow — Native App v3.0 (APK banane ke steps)
 
 Ye **proper native app** hai. Is mein website load NAHI hoti, koi WebView NAHI hai.
 Saare features app ke andar bane hain: PDF upload, Summary, MCQs, Quiz, Ask the PDF,
 Translate, AI Chat, Gemini key box.
 
-Package: com.qognix.docuflow — Version 2.1 (purani v1 wali app ki jagah install hogi)
+Package: com.qognix.docuflow — Version 3.0 (purani v1 wali app ki jagah install hogi)
 
 ## APK free mein banane ka tareeqa (GitHub, phone se)
 
@@ -28,7 +28,8 @@ Package: com.qognix.docuflow — Version 2.1 (purani v1 wali app ki jagah instal
   is liye GitHub wala free rasta hi proven rasta hai (v1 isi se bani thi).
 - Compilation abhi GitHub build se hi verify hogi — main jhoot nahi bolunga ke
   APK tayyar hai jab tak GitHub build green na ho.
-- Ads: v2.1 mein Start.io ke full-screen video ads hain (user ki apni Start.io
-  App ID 210654162) — tool kholne par interstitial video, aur home screen par
-  rewarded video wala button. Adsterra banner native mein nahi chalte. Koi
-  popunder ya fake ad nahi hai.
+- Ads: v3.0 mein Start.io ke chaaron format hain (user ki apni Start.io App ID
+  210654162) — neeche banner, Documents mein ek labelled native ad, result
+  screen se wapas ane par interstitial (time cap ke sath), aur home par
+  rewarded video wala button. Debug (test) APK mein test ads ate hain,
+  release mein asal ads. Koi popunder ya fake ad nahi hai.
