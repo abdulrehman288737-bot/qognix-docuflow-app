@@ -48,7 +48,7 @@ public class SettingsActivity extends AppCompatActivity {
                 new View.OnClickListener[]{
                         v -> new AlertDialog.Builder(SettingsActivity.this)
                                 .setTitle("Notifications")
-                                .setMessage("You are all caught up.\n\nQognix DocuFlow v3.2 — premium design on every screen, with safe spacing from the system bars.")
+                                .setMessage("You are all caught up.\n\nQognix DocuFlow v3.3 — premium design on every screen, with safe spacing from the system bars.")
                                 .setPositiveButton("OK", null)
                                 .show(),
                         v -> {
@@ -66,7 +66,7 @@ public class SettingsActivity extends AppCompatActivity {
         buildPrivacy(root);
 
         Ui.card(this, root, "About Qognix DocuFlow",
-                "Version 3.2 — a native Android app (no website inside). Turn PDFs into summaries, MCQs, quizzes, answers, translations and simple explanations.\n\nYour Documents. Smarter with AI.");
+                "Version 3.3 — a native Android app (no website inside). Turn PDFs into summaries, MCQs, quizzes, answers, translations and simple explanations.\n\nYour Documents. Smarter with AI.");
 
         Ads.addBanner(this, sc.bannerBox);
         setContentView(sc.root);
@@ -113,8 +113,8 @@ public class SettingsActivity extends AppCompatActivity {
         LinearLayout row = new LinearLayout(this);
         row.setOrientation(LinearLayout.HORIZONTAL);
         boolean darkNow = !"light".equals(Store.theme(this));
-        row.addView(themePill("☾  Dark theme", darkNow, v -> { Store.setTheme(this, "dark"); recreate(); }), Ui.third());
-        row.addView(themePill("☀  Light theme", !darkNow, v -> { Store.setTheme(this, "light"); recreate(); }), Ui.third());
+        row.addView(themePill("☾  Dark theme", darkNow, v -> { Sfx.pop(); Store.setTheme(this, "dark"); recreate(); }), Ui.third());
+        row.addView(themePill("☀  Light theme", !darkNow, v -> { Sfx.pop(); Store.setTheme(this, "light"); recreate(); }), Ui.third());
         LinearLayout.LayoutParams rp = new LinearLayout.LayoutParams(-1, -2);
         rp.setMargins(0, 16, 0, 0);
         row.setLayoutParams(rp);

@@ -1,6 +1,7 @@
 package com.qognix.docuflow;
 import android.os.Bundle; import android.widget.*; import androidx.appcompat.app.AppCompatActivity;
 public class ChatActivity extends AppCompatActivity {
+  @Override public void finish(){ super.finish(); Ui.backAnim(this); }
   LinearLayout msgs; EditText input; String history="";
   protected void onCreate(Bundle s){ super.onCreate(s); Ui.applyTheme(this); Ads.init(this); LinearLayout root=Ui.root(this);
     root.addView(Ui.text(this,"AI Chat",24,Ui.TEXT,true)); root.addView(Ui.text(this,"Chat about: "+Store.docName(this),13,Ui.SUB,false));

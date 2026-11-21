@@ -17,6 +17,12 @@ import java.util.List;
 // question at a time, sees the correct answer and explanation, and gets a
 // final score with a retry option.
 public class QuizActivity extends AppCompatActivity {
+    @Override
+    public void finish() {
+        super.finish();
+        Ui.backAnim(this);
+    }
+
     LinearLayout root, quizBox;
     TextView statusLine;
     List<LocalTools.QItem> items;

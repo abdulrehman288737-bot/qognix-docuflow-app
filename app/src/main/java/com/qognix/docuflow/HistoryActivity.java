@@ -108,7 +108,7 @@ public class HistoryActivity extends AppCompatActivity {
             chev.setGravity(Gravity.CENTER);
             chev.setBackground(Ui.bg(Ui.CARD2, 40, 1));
             c.addView(chev, new LinearLayout.LayoutParams(64, 64));
-            c.setOnClickListener(v -> openItem(h));
+            c.setOnClickListener(v -> { Sfx.pop(); openItem(h); });
             listBox.addView(c);
         }
     }

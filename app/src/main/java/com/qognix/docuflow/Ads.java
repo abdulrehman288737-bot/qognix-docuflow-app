@@ -37,7 +37,8 @@ import java.util.ArrayList;
 //   screen, finishing a quiz), never on every click, with a time cap.
 // - Native: one clearly-labelled card inside the Documents list.
 // - Rewarded: only when the user taps the "Watch a video ad" button.
-// - Return ads are disabled. Splash ads are not used.
+// - Return ads are disabled. One launch interstitial is shown when the
+//   app opens (added in v3.3 at the user's explicit request).
 // - Test ads are enabled automatically in DEBUG builds only (the APK the
 //   user tests with); release builds serve real ads.
 // - Every call is wrapped so an ad failure can never crash or block the app.
@@ -138,6 +139,32 @@ public class Ads {
             once.run();
         }
         preloadInterstitial(a);
+    }
+
+    // ---- Launch ad (one interstitial when the app opens; user request) ----
+    private static boolean launchAdShown = false;
+    private static StartAppAd launchAd = null;
+
+    public static void showLaunchAd(final Activity a) {
+        if (launchAdShown) return;
+        launchAdShown = true;
+        try {
+            launchAd = new StartAppAd(a);
+            launchAd.loadAd(new AdEventListener() {
+                @Override
+                public void onReceiveAd(@NonNull Ad ad) {
+                    try {
+                        if (!a.isFinishing() && !a.isDestroyed()) {
+                            launchAd.showAd();
+                            lastInterstitialShown = System.currentTimeMillis();
+                        }
+                    } catch (Throwable ignored) { }
+                }
+
+                @Override
+                public void onFailedToReceiveAd(@Nullable Ad ad) { }
+            });
+        } catch (Throwable ignored) { }
     }
 
     // ---- Rewarded video (explicit user choice only) ----

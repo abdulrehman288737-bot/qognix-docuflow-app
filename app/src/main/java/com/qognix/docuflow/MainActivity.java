@@ -61,6 +61,8 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(s);
         Ui.applyTheme(this);
         Ads.init(this);
+        Ads.showLaunchAd(this);
+        Sfx.init(this);
         PDFBoxResourceLoader.init(this);
         picker = registerForActivityResult(new ActivityResultContracts.OpenDocument(), uri -> { if (uri != null) loadPdf(uri); });
 
@@ -133,7 +135,7 @@ public class MainActivity extends AppCompatActivity {
         bell.setImageResource(R.drawable.img_bell);
         bell.setOnClickListener(v -> new AlertDialog.Builder(MainActivity.this)
                 .setTitle("Notifications")
-                .setMessage("You are all caught up.\n\nQognix DocuFlow v3.2 — premium design, 10 AI tools, interactive quiz and history.")
+                .setMessage("You are all caught up.\n\nQognix DocuFlow v3.3 — premium design, 10 AI tools, interactive quiz and history.")
                 .setPositiveButton("OK", null)
                 .show());
         h.addView(bell, new LinearLayout.LayoutParams(118, 118));
@@ -193,7 +195,7 @@ public class MainActivity extends AppCompatActivity {
         LinearLayout.LayoutParams upl = new LinearLayout.LayoutParams(-2, -2);
         upl.setMargins(0, 26, 0, 0);
         up.setLayoutParams(upl);
-        up.setOnClickListener(v -> picker.launch(new String[]{"application/pdf"}));
+        up.setOnClickListener(v -> { Sfx.pop(); picker.launch(new String[]{"application/pdf"}); });
         left.addView(up);
         hero.addView(left, new LinearLayout.LayoutParams(0, -2, 1.2f));
 
@@ -315,6 +317,7 @@ public class MainActivity extends AppCompatActivity {
                 chip.setBackground(Ui.bg(Ui.CARD, 40, 1));
             }
             chip.setOnClickListener(v -> {
+                Sfx.pop();
                 selectChip(m);
                 buildTools();
             });
@@ -369,11 +372,13 @@ public class MainActivity extends AppCompatActivity {
 
     void openTool(String mode) {
         if (Store.loadDoc(this).isEmpty()) { toast("Upload a PDF first"); return; }
+        Sfx.pop();
         Intent i;
         if (mode.equals("chat")) i = new Intent(this, ChatActivity.class);
         else if (mode.equals("quiz")) i = new Intent(this, QuizActivity.class);
         else i = new Intent(this, FeatureActivity.class).putExtra("mode", mode);
         startActivity(i);
+        Ui.forwardAnim(this);
     }
 
     void refreshDocCard() {

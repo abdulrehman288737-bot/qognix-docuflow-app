@@ -175,6 +175,12 @@ public class FeatureActivity extends AppCompatActivity {
         }
     }
 
+    @Override
+    public void finish() {
+        super.finish();
+        Ui.backAnim(this);
+    }
+
     void generate() {
         if (busy) return;
         String doc = Store.loadDoc(this);

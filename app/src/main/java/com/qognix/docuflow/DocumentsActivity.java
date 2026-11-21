@@ -47,7 +47,7 @@ public class DocumentsActivity extends AppCompatActivity {
         root.addView(Ui.titleBlock(this, "Documents", "Saved privately on this phone. Tap a document to make it active, then use the tools on Home."));
         Button add = Ui.button(this, "+  Add PDF");
         add.setBackground(Ui.gradientBg(28));
-        add.setOnClickListener(v -> picker.launch(new String[]{"application/pdf"}));
+        add.setOnClickListener(v -> { Sfx.pop(); picker.launch(new String[]{"application/pdf"}); });
         root.addView(add);
         listBox = new LinearLayout(this);
         listBox.setOrientation(LinearLayout.VERTICAL);
@@ -136,11 +136,13 @@ public class DocumentsActivity extends AppCompatActivity {
             row.setOrientation(LinearLayout.HORIZONTAL);
             Button open = Ui.ghostButton(this, "Open");
             open.setOnClickListener(v -> {
+                Sfx.pop();
                 Store.setCurrent(this, d[0]);
                 toast("Active document: " + d[1]);
                 Intent i = new Intent(this, MainActivity.class);
                 i.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
                 startActivity(i);
+                Ui.backAnim(this);
                 finish();
             });
             Button rename = Ui.ghostButton(this, "Rename");

@@ -82,6 +82,15 @@ public class Ui {
         });
     }
 
+    // Page-transition helpers: forward (opening a tool) and back (leaving).
+    public static void forwardAnim(Activity a) {
+        a.overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
+    }
+
+    public static void backAnim(Activity a) {
+        a.overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_right);
+    }
+
     public static GradientDrawable gradientBg(int radius) {
         GradientDrawable g = new GradientDrawable(GradientDrawable.Orientation.TL_BR,
                 new int[]{Color.rgb(146, 96, 250), VIOLET});
@@ -277,9 +286,13 @@ public class Ui {
             item.addView(t);
             item.setOnClickListener(v -> {
                 if (idx == activeTab) return;
+                Sfx.init(a);
+                Sfx.whoosh();
                 Intent in = new Intent(a, targets[idx]);
                 in.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
                 a.startActivity(in);
+                if (idx > activeTab) a.overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
+                else a.overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_right);
                 a.finish();
             });
             nav.addView(item, new LinearLayout.LayoutParams(0, -2, 1f));
