@@ -5,7 +5,7 @@ import com.tom_roush.pdfbox.android.PDFBoxResourceLoader; import com.tom_roush.p
 public class MainActivity extends AppCompatActivity {
   TextView status; EditText keyInput;
   ActivityResultLauncher<String[]> picker;
-  protected void onCreate(Bundle s){ super.onCreate(s); PDFBoxResourceLoader.init(this); picker=registerForActivityResult(new ActivityResultContracts.OpenDocument(), uri->{ if(uri!=null) loadPdf(uri); });
+  protected void onCreate(Bundle s){ super.onCreate(s); Ads.init(this); Ads.preload(this); PDFBoxResourceLoader.init(this); picker=registerForActivityResult(new ActivityResultContracts.OpenDocument(), uri->{ if(uri!=null) loadPdf(uri); });
     LinearLayout root=Ui.root(this);
     root.addView(Ui.text(this,"Qognix DocuFlow",26,Ui.TEXT,true));
     root.addView(Ui.text(this,"Your Documents. Smarter with AI.",15,Ui.LIGHT,false));
@@ -18,8 +18,9 @@ public class MainActivity extends AppCompatActivity {
     Button save=Ui.button(this,"Save, Test & Use Key"); root.addView(save);
     save.setOnClickListener(v->{ String k=keyInput.getText().toString().trim(); if(k.isEmpty()){ toast("Paste a key first"); return; } Store.setKey(this,k); status.setText("Testing Gemini key..."); GeminiClient.generate(k,"Reply with exactly: OK", new GeminiClient.Cb(){ public void ok(String t,String m){ runOnUiThread(()->{ status.setText("Gemini ON — working model: "+m); toast("Gemini key works: "+m); }); } public void fail(String msg){ runOnUiThread(()->status.setText("Gemini test failed: "+msg)); } }); });
     String[][] tools={{"summary","Summary — short notes from your PDF"},{"mcq","MCQs — multiple choice questions"},{"quiz","Quiz — fill-in questions with answers"},{"ask","Ask the PDF — answer from your document"},{"translate","Translate — translate PDF text"},{"chat","AI Chat — chat about your document"}};
-    for(String[] t: tools){ Button b=Ui.button(this,t[1]); final String mode=t[0]; b.setOnClickListener(v->{ if(Store.loadDoc(this).isEmpty()){ toast("Upload a PDF first"); return; } Intent i = mode.equals("chat")? new Intent(this,ChatActivity.class): new Intent(this,FeatureActivity.class).putExtra("mode",mode); startActivity(i); }); root.addView(b); }
-    root.addView(Ui.text(this,"Banner ads note: the website's Adsterra banners needed a web view, so they are NOT included in this native version — no fake ads, no popunder.",12,Ui.SUB,false));
+    for(String[] t: tools){ Button b=Ui.button(this,t[1]); final String mode=t[0]; b.setOnClickListener(v->{ if(Store.loadDoc(this).isEmpty()){ toast("Upload a PDF first"); return; } Intent i = mode.equals("chat")? new Intent(this,ChatActivity.class): new Intent(this,FeatureActivity.class).putExtra("mode",mode); startActivity(i); Ads.showInterstitial(this); }); root.addView(b); }
+    Button watch=Ui.button(this,"Watch a video ad (optional)"); watch.setOnClickListener(v->{ if(!Ads.showRewarded(this)) toast("Video ad is still loading — try again in a few seconds"); }); root.addView(watch);
+    root.addView(Ui.text(this,"Ads: full-screen video ads by Start.io. A video ad may appear when you open a tool, and the button above plays a rewarded video ad whenever you want. No popunder, no fake ads.",12,Ui.SUB,false));
     setContentView(Ui.scroll(this,root));
   }
   void toast(String m){ Toast.makeText(this,m,Toast.LENGTH_LONG).show(); }
