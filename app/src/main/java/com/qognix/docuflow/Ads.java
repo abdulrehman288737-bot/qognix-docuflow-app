@@ -201,12 +201,20 @@ public class Ads {
                         lp.setMargins(0, 14, 0, 14);
                         card.setLayoutParams(lp);
                         card.addView(Ui.text(a, "Advertisement", 11, Ui.LIGHT, true));
-                        Bitmap bmp = d.getBitmap();
-                        if (bmp != null) {
-                            ImageView iv = new ImageView(a);
-                            iv.setImageBitmap(bmp);
-                            iv.setAdjustViewBounds(true);
-                            card.addView(iv);
+                        // SDK 5.x exposes the ad image as a URL (there is no
+                        // getBitmap()); download it in the background.
+                        final ImageView iv = new ImageView(a);
+                        iv.setAdjustViewBounds(true);
+                        card.addView(iv);
+                        final String imgUrl = d.getImageUrl();
+                        if (imgUrl != null && !imgUrl.isEmpty()) {
+                            new Thread(() -> {
+                                try {
+                                    java.io.InputStream in = new java.net.URL(imgUrl).openStream();
+                                    final Bitmap bmp = android.graphics.BitmapFactory.decodeStream(in);
+                                    if (bmp != null) a.runOnUiThread(() -> iv.setImageBitmap(bmp));
+                                } catch (Throwable ignored) { }
+                            }).start();
                         }
                         if (d.getTitle() != null) card.addView(Ui.text(a, d.getTitle(), 16, Ui.TEXT, true));
                         if (d.getDescription() != null) card.addView(Ui.text(a, d.getDescription(), 13, Ui.SUB, false));
