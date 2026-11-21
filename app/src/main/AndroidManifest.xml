@@ -10,5 +10,9 @@
         </activity>
         <activity android:name=".FeatureActivity" android:exported="false" />
         <activity android:name=".ChatActivity" android:exported="false" />
+        <activity android:name=".QuizActivity" android:exported="false" />
+        <activity android:name=".DocumentsActivity" android:exported="false" />
+        <activity android:name=".HistoryActivity" android:exported="false" />
+        <activity android:name=".SettingsActivity" android:exported="false" />
     </application>
 </manifest>
