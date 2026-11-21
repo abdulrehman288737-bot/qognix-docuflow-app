@@ -23,14 +23,20 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      # Design artwork (tool icons, logo, hero image, nav icons) ships as one
-      # zip at the repo root because the GitHub web uploader cannot create
-      # the new res/drawable-nodpi folder directly.
+      # Design artwork (tool icons, logo, hero image, nav icons) and the
+      # page-transition animations ship as zips at the repo root because
+      # the GitHub web uploader cannot create new res/assets folders.
       - name: Unpack design assets
         run: |
-          mkdir -p app/src/main/res/drawable-nodpi
-          unzip -o design-assets.zip -d app/src/main/res/drawable-nodpi
+          rm -rf /tmp/qx && mkdir -p /tmp/qx
+          unzip -o design-assets.zip -d /tmp/qx
+          mkdir -p app/src/main/res/drawable-nodpi app/src/main/res/anim app/src/main/assets
+          cp /tmp/qx/*.png app/src/main/res/drawable-nodpi/
+          cp /tmp/qx/anim/*.xml app/src/main/res/anim/
+          unzip -o sounds.zip -d app/src/main/assets
           ls app/src/main/res/drawable-nodpi | wc -l
+          ls app/src/main/res/anim | wc -l
+          ls app/src/main/assets
 
       - name: Set up JDK 17
         uses: actions/setup-java@v4
