@@ -162,31 +162,45 @@ public class Ui {
         LinearLayout nav = new LinearLayout(a);
         nav.setOrientation(LinearLayout.HORIZONTAL);
         nav.setBackgroundColor(CARD);
-        nav.setPadding(8, 10, 8, 10);
+        nav.setPadding(10, 12, 10, 14);
         String[] labels = {"Home", "Documents", "History", "Settings"};
+        int[] icons = {R.drawable.nav_home, R.drawable.nav_docs, R.drawable.nav_history, R.drawable.nav_settings};
         final Class<?>[] targets = {MainActivity.class, DocumentsActivity.class, HistoryActivity.class, SettingsActivity.class};
         for (int i = 0; i < labels.length; i++) {
             final int idx = i;
+            LinearLayout item = new LinearLayout(a);
+            item.setOrientation(LinearLayout.VERTICAL);
+            item.setGravity(Gravity.CENTER);
+            android.widget.ImageView iv = new android.widget.ImageView(a);
+            iv.setImageResource(icons[i]);
+            if (i == activeTab) {
+                iv.setColorFilter(Color.WHITE);
+                iv.setBackground(bg(VIOLET, 40, 0));
+                iv.setPadding(34, 12, 34, 12);
+            } else {
+                iv.setColorFilter(SUB);
+                iv.setPadding(34, 12, 34, 12);
+            }
+            item.addView(iv, new LinearLayout.LayoutParams(-2, 92));
             TextView t = new TextView(a);
             t.setText(labels[i]);
-            t.setTextSize(14);
+            t.setTextSize(13);
             t.setGravity(Gravity.CENTER);
-            t.setPadding(0, 18, 0, 18);
             if (i == activeTab) {
-                t.setTextColor(Color.WHITE);
+                t.setTextColor(TEXT);
                 t.setTypeface(Typeface.DEFAULT_BOLD);
-                t.setBackground(bg(VIOLET, 24, 0));
             } else {
                 t.setTextColor(SUB);
             }
-            t.setOnClickListener(v -> {
+            item.addView(t);
+            item.setOnClickListener(v -> {
                 if (idx == activeTab) return;
                 Intent in = new Intent(a, targets[idx]);
                 in.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
                 a.startActivity(in);
                 a.finish();
             });
-            nav.addView(t, new LinearLayout.LayoutParams(0, -2, 1f));
+            nav.addView(item, new LinearLayout.LayoutParams(0, -2, 1f));
         }
         return nav;
     }
