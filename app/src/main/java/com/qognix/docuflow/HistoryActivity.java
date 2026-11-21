@@ -5,8 +5,11 @@ import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Typeface;
 import android.os.Bundle;
+import android.view.Gravity;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
@@ -18,8 +21,9 @@ import java.text.DateFormat;
 import java.util.Date;
 import java.util.List;
 
-// History tab: every generated result is saved here automatically.
-// Tap an item to read it, copy it, share it or delete it.
+// History tab in the approved premium design: PDF-tile result cards with
+// date and a round chevron, a gradient Clear button and a trash shortcut
+// in the header. Tap an item to read, copy, share or delete it.
 public class HistoryActivity extends AppCompatActivity {
     LinearLayout listBox;
 
@@ -30,14 +34,13 @@ public class HistoryActivity extends AppCompatActivity {
         Ads.init(this);
         Ui.Scaffold sc = Ui.scaffold(this, 2);
         LinearLayout root = sc.content;
-        root.addView(Ui.text(this, "History", 24, Ui.TEXT, true));
-        root.addView(Ui.text(this, "Results you generate are saved here, privately on this phone.", 13, Ui.SUB, false));
-        Button clear = Ui.ghostButton(this, "Clear all history");
-        clear.setOnClickListener(v -> {
-            Store.clearHistory(this);
-            toast("History cleared");
-            refresh();
-        });
+        root.addView(Ui.pageHeader(this,
+                new int[]{R.drawable.icon_trash},
+                new android.view.View.OnClickListener[]{v -> confirmClear()}));
+        root.addView(Ui.titleBlock(this, "History", "Results you generate are saved here, privately on this phone."));
+        Button clear = Ui.button(this, "Clear all history");
+        clear.setBackground(Ui.gradientBg(28));
+        clear.setOnClickListener(v -> confirmClear());
         root.addView(clear);
         listBox = new LinearLayout(this);
         listBox.setOrientation(LinearLayout.VERTICAL);
@@ -45,6 +48,20 @@ public class HistoryActivity extends AppCompatActivity {
         refresh();
         Ads.addBanner(this, sc.bannerBox);
         setContentView(sc.root);
+    }
+
+    void confirmClear() {
+        if (Store.history(this).isEmpty()) { toast("History is already empty"); return; }
+        new AlertDialog.Builder(this)
+                .setTitle("Clear all history?")
+                .setMessage("All saved results on this phone will be deleted.")
+                .setPositiveButton("Clear", (d, w) -> {
+                    Store.clearHistory(this);
+                    toast("History cleared");
+                    refresh();
+                })
+                .setNegativeButton("Cancel", null)
+                .show();
     }
 
     void refresh() {
@@ -56,16 +73,41 @@ public class HistoryActivity extends AppCompatActivity {
         }
         for (final String[] h : hist) {
             LinearLayout c = new LinearLayout(this);
-            c.setOrientation(LinearLayout.VERTICAL);
+            c.setOrientation(LinearLayout.HORIZONTAL);
+            c.setGravity(Gravity.CENTER_VERTICAL);
             c.setBackground(Ui.bg(Ui.CARD, 28, 1));
-            c.setPadding(30, 24, 30, 24);
+            c.setPadding(26, 22, 26, 22);
             LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(-1, -2);
-            lp.setMargins(0, 14, 0, 14);
+            lp.setMargins(0, 12, 0, 12);
             c.setLayoutParams(lp);
-            c.addView(Ui.text(this, h[1], 16, Ui.TEXT, true));
+            ImageView iv = new ImageView(this);
+            iv.setImageResource(R.drawable.icon_pdf);
+            c.addView(iv, new LinearLayout.LayoutParams(96, 128));
+            LinearLayout mid = new LinearLayout(this);
+            mid.setOrientation(LinearLayout.VERTICAL);
+            mid.setPadding(22, 0, 8, 0);
+            TextView title = new TextView(this);
+            title.setText(h[1]);
+            title.setTextColor(Ui.TEXT);
+            title.setTextSize(16);
+            title.setTypeface(Typeface.DEFAULT_BOLD);
+            mid.addView(title);
             String when = "";
             try { when = DateFormat.getDateTimeInstance(DateFormat.MEDIUM, DateFormat.SHORT).format(new Date(Long.parseLong(h[3]))); } catch (Exception ignored) { }
-            c.addView(Ui.text(this, (h[2].isEmpty() ? "" : h[2] + "  •  ") + when, 13, Ui.SUB, false));
+            TextView sub = new TextView(this);
+            sub.setText((h[2].isEmpty() ? "" : h[2] + "  •  ") + when);
+            sub.setTextColor(Ui.SUB);
+            sub.setTextSize(13);
+            mid.addView(sub);
+            c.addView(mid, new LinearLayout.LayoutParams(0, -2, 1f));
+            TextView chev = new TextView(this);
+            chev.setText("›");
+            chev.setTextColor(Ui.SUB);
+            chev.setTextSize(22);
+            chev.setTypeface(Typeface.DEFAULT_BOLD);
+            chev.setGravity(Gravity.CENTER);
+            chev.setBackground(Ui.bg(Ui.CARD2, 40, 1));
+            c.addView(chev, new LinearLayout.LayoutParams(64, 64));
             c.setOnClickListener(v -> openItem(h));
             listBox.addView(c);
         }

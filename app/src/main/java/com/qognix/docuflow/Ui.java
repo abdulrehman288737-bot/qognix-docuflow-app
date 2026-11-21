@@ -64,8 +64,89 @@ public class Ui {
     public static ScrollView scroll(Activity a, LinearLayout inner) {
         ScrollView s = new ScrollView(a);
         s.setBackgroundColor(NAVY);
+        s.setClipToPadding(false);
         s.addView(inner);
+        applyInsets(s);
         return s;
+    }
+
+    // Keep content clear of the status bar (top) and the system navigation
+    // bar (bottom) on edge-to-edge Android versions, so nothing looks cut.
+    public static void applyInsets(final View v) {
+        v.setOnApplyWindowInsetsListener((view, insets) -> {
+            view.setPadding(view.getPaddingLeft(),
+                    insets.getSystemWindowInsetTop(),
+                    view.getPaddingRight(),
+                    insets.getSystemWindowInsetBottom());
+            return insets;
+        });
+    }
+
+    public static GradientDrawable gradientBg(int radius) {
+        GradientDrawable g = new GradientDrawable(GradientDrawable.Orientation.TL_BR,
+                new int[]{Color.rgb(146, 96, 250), VIOLET});
+        g.setCornerRadius(radius);
+        return g;
+    }
+
+    // Design header for the tab screens: app logo, two-line name, tagline,
+    // and one or two round image buttons on the right.
+    public static LinearLayout pageHeader(final Activity a, int[] iconRes, View.OnClickListener[] clicks) {
+        LinearLayout h = new LinearLayout(a);
+        h.setOrientation(LinearLayout.HORIZONTAL);
+        h.setGravity(Gravity.CENTER_VERTICAL);
+        android.widget.ImageView logo = new android.widget.ImageView(a);
+        logo.setImageResource(R.drawable.img_logo);
+        h.addView(logo, new LinearLayout.LayoutParams(118, 118));
+        LinearLayout titles = new LinearLayout(a);
+        titles.setOrientation(LinearLayout.VERTICAL);
+        titles.setPadding(20, 0, 0, 0);
+        TextView n1 = new TextView(a);
+        n1.setText("Qognix");
+        n1.setTextColor(TEXT);
+        n1.setTextSize(20);
+        n1.setTypeface(Typeface.DEFAULT_BOLD);
+        titles.addView(n1);
+        TextView n2 = new TextView(a);
+        n2.setText("DocuFlow");
+        n2.setTextColor(LIGHT);
+        n2.setTextSize(20);
+        n2.setTypeface(Typeface.DEFAULT_BOLD);
+        titles.addView(n2);
+        TextView tag = new TextView(a);
+        tag.setText("Your Documents. Smarter with AI.");
+        tag.setTextColor(SUB);
+        tag.setTextSize(11);
+        titles.addView(tag);
+        h.addView(titles, new LinearLayout.LayoutParams(0, -2, 1f));
+        if (iconRes != null) {
+            for (int i = 0; i < iconRes.length; i++) {
+                android.widget.ImageView b = new android.widget.ImageView(a);
+                b.setImageResource(iconRes[i]);
+                if (clicks != null && i < clicks.length && clicks[i] != null) b.setOnClickListener(clicks[i]);
+                LinearLayout.LayoutParams bp = new LinearLayout.LayoutParams(104, 104);
+                if (i > 0) bp.setMargins(12, 0, 0, 0);
+                h.addView(b, bp);
+            }
+        }
+        h.setPadding(0, 4, 0, 8);
+        return h;
+    }
+
+    public static LinearLayout titleBlock(Activity a, String title, String subtitle) {
+        LinearLayout b = new LinearLayout(a);
+        b.setOrientation(LinearLayout.VERTICAL);
+        TextView t = new TextView(a);
+        t.setText(title);
+        t.setTextColor(TEXT);
+        t.setTextSize(27);
+        t.setTypeface(Typeface.DEFAULT_BOLD);
+        t.setPadding(0, 18, 0, 0);
+        b.addView(t);
+        TextView s = text(a, subtitle, 13, SUB, false);
+        s.setPadding(0, 2, 0, 10);
+        b.addView(s);
+        return b;
     }
 
     public static TextView text(Activity a, String t, int sp, int color, boolean bold) {
@@ -155,6 +236,7 @@ public class Ui {
         sc.bannerBox.setGravity(Gravity.CENTER);
         sc.root.addView(sc.bannerBox);
         sc.root.addView(navBar(a, activeTab));
+        applyInsets(sc.root);
         return sc;
     }
 

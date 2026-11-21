@@ -2,11 +2,14 @@ package com.qognix.docuflow;
 
 import android.app.AlertDialog;
 import android.content.Intent;
+import android.graphics.Typeface;
 import android.net.Uri;
 import android.os.Bundle;
+import android.view.Gravity;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -21,9 +24,10 @@ import java.text.DateFormat;
 import java.util.Date;
 import java.util.List;
 
-// Documents tab: the private on-device library. Open, rename, remove and
-// re-open saved PDFs. One clearly-labelled Start.io native ad card may
-// appear in the list. Documents never leave the phone from this screen.
+// Documents tab in the approved premium design: gradient Add PDF button,
+// PDF-tile document cards (open / rename / remove preserved), an empty
+// state with the design's folder illustration, and one clearly-labelled
+// Start.io native ad card in the list. Documents never leave the phone.
 public class DocumentsActivity extends AppCompatActivity {
     LinearLayout listBox;
     ActivityResultLauncher<String[]> picker;
@@ -37,9 +41,12 @@ public class DocumentsActivity extends AppCompatActivity {
         picker = registerForActivityResult(new ActivityResultContracts.OpenDocument(), uri -> { if (uri != null) loadPdf(uri); });
         Ui.Scaffold sc = Ui.scaffold(this, 1);
         LinearLayout root = sc.content;
-        root.addView(Ui.text(this, "Documents", 24, Ui.TEXT, true));
-        root.addView(Ui.text(this, "Saved privately on this phone. Tap a document to make it active, then use the tools on Home.", 13, Ui.SUB, false));
-        Button add = Ui.button(this, "Add PDF");
+        root.addView(Ui.pageHeader(this,
+                new int[]{R.drawable.icon_addfolder},
+                new View.OnClickListener[]{v -> picker.launch(new String[]{"application/pdf"})}));
+        root.addView(Ui.titleBlock(this, "Documents", "Saved privately on this phone. Tap a document to make it active, then use the tools on Home."));
+        Button add = Ui.button(this, "+  Add PDF");
+        add.setBackground(Ui.gradientBg(28));
         add.setOnClickListener(v -> picker.launch(new String[]{"application/pdf"}));
         root.addView(add);
         listBox = new LinearLayout(this);
@@ -54,7 +61,41 @@ public class DocumentsActivity extends AppCompatActivity {
         listBox.removeAllViews();
         List<String[]> docs = Store.docs(this);
         if (docs.isEmpty()) {
-            Ui.card(this, listBox, "No documents yet", "Upload your first PDF from Home or with the Add PDF button above. It will appear here and stay on your phone.");
+            LinearLayout c = new LinearLayout(this);
+            c.setOrientation(LinearLayout.HORIZONTAL);
+            c.setGravity(Gravity.CENTER_VERTICAL);
+            c.setBackground(Ui.bg(Ui.CARD, 28, 1));
+            c.setPadding(28, 24, 28, 24);
+            LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(-1, -2);
+            lp.setMargins(0, 12, 0, 12);
+            c.setLayoutParams(lp);
+            ImageView iv = new ImageView(this);
+            iv.setImageResource(R.drawable.icon_lockshield);
+            c.addView(iv, new LinearLayout.LayoutParams(110, 110));
+            LinearLayout tt = new LinearLayout(this);
+            tt.setOrientation(LinearLayout.VERTICAL);
+            tt.setPadding(20, 0, 0, 0);
+            TextView t = new TextView(this);
+            t.setText("No documents yet");
+            t.setTextColor(Ui.TEXT);
+            t.setTextSize(17);
+            t.setTypeface(Typeface.DEFAULT_BOLD);
+            tt.addView(t);
+            TextView st = new TextView(this);
+            st.setText("Upload your first PDF from Home or with the Add PDF button above. It will appear here and stay on your phone.");
+            st.setTextColor(Ui.SUB);
+            st.setTextSize(13);
+            tt.addView(st);
+            c.addView(tt, new LinearLayout.LayoutParams(0, -2, 1f));
+            listBox.addView(c);
+            ImageView art = new ImageView(this);
+            art.setImageResource(R.drawable.img_folder);
+            art.setScaleType(ImageView.ScaleType.FIT_CENTER);
+            LinearLayout.LayoutParams ap = new LinearLayout.LayoutParams(560, 560);
+            ap.gravity = Gravity.CENTER_HORIZONTAL;
+            ap.setMargins(0, 26, 0, 0);
+            art.setLayoutParams(ap);
+            listBox.addView(art);
             return;
         }
         boolean adInserted = false;
@@ -62,15 +103,35 @@ public class DocumentsActivity extends AppCompatActivity {
             LinearLayout c = new LinearLayout(this);
             c.setOrientation(LinearLayout.VERTICAL);
             c.setBackground(Ui.bg(Ui.CARD, 28, 1));
-            c.setPadding(30, 24, 30, 24);
+            c.setPadding(26, 22, 26, 22);
             LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(-1, -2);
-            lp.setMargins(0, 14, 0, 14);
+            lp.setMargins(0, 12, 0, 12);
             c.setLayoutParams(lp);
+            LinearLayout top = new LinearLayout(this);
+            top.setOrientation(LinearLayout.HORIZONTAL);
+            top.setGravity(Gravity.CENTER_VERTICAL);
+            ImageView iv = new ImageView(this);
+            iv.setImageResource(R.drawable.icon_pdf);
+            top.addView(iv, new LinearLayout.LayoutParams(88, 118));
+            LinearLayout mid = new LinearLayout(this);
+            mid.setOrientation(LinearLayout.VERTICAL);
+            mid.setPadding(20, 0, 0, 0);
             boolean active = d[0].equals(Store.currentId(this));
-            c.addView(Ui.text(this, d[1] + (active ? "  •  ACTIVE" : ""), 16, active ? Ui.LIGHT : Ui.TEXT, true));
+            TextView name = new TextView(this);
+            name.setText(d[1] + (active ? "  •  ACTIVE" : ""));
+            name.setTextColor(active ? Ui.LIGHT : Ui.TEXT);
+            name.setTextSize(16);
+            name.setTypeface(Typeface.DEFAULT_BOLD);
+            mid.addView(name);
             String when = "";
             try { when = " • " + DateFormat.getDateInstance(DateFormat.MEDIUM).format(new Date(Long.parseLong(d[4]))); } catch (Exception ignored) { }
-            c.addView(Ui.text(this, d[2] + " pages • " + d[3] + " KB" + when, 13, Ui.SUB, false));
+            TextView meta = new TextView(this);
+            meta.setText(d[2] + " pages • " + d[3] + " KB" + when);
+            meta.setTextColor(Ui.SUB);
+            meta.setTextSize(13);
+            mid.addView(meta);
+            top.addView(mid, new LinearLayout.LayoutParams(0, -2, 1f));
+            c.addView(top);
             LinearLayout row = new LinearLayout(this);
             row.setOrientation(LinearLayout.HORIZONTAL);
             Button open = Ui.ghostButton(this, "Open");
