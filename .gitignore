@@ -1,10 +1,5 @@
+/build
+/app/build
+/local.properties
 *.iml
 .gradle
-/local.properties
-/.idea
-/app/build
-/build
-# Signing material must never be committed publicly
-*.jks
-*.keystore
-keystore.properties
