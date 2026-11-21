@@ -124,7 +124,7 @@ public class SettingsActivity extends AppCompatActivity {
 
         // ---- About ----
         Ui.card(this, root, "About Qognix DocuFlow",
-                "Version 3.0 — a native Android app (no website inside). Turn PDFs into summaries, MCQs, quizzes, answers, translations and simple explanations.\n\nYour Documents. Smarter with AI.");
+                "Version 3.1 — a native Android app (no website inside). Turn PDFs into summaries, MCQs, quizzes, answers, translations and simple explanations.\n\nYour Documents. Smarter with AI.");
 
         Ads.addBanner(this, sc.bannerBox);
         setContentView(sc.root);
