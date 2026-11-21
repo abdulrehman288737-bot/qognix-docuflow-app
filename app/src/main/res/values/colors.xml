@@ -1,3 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
-<color name="navy">#0B1020</color><color name="navy_card">#19233D</color><color name="violet">#7657FF</color><color name="violet_light">#A78BFA</color><color name="text_primary">#F8FAFC</color><color name="text_secondary">#A7B0C3</color><color name="white">#FFFFFF</color>
+    <color name="navy">#11182B</color>
+    <color name="navy_card">#1B2440</color>
+    <color name="violet">#7654F6</color>
+    <color name="violet_light">#B9A8FF</color>
+    <color name="text_primary">#F5F4FA</color>
+    <color name="text_secondary">#A7AEC2</color>
+    <color name="white">#FFFFFF</color>
 </resources>
