@@ -2,7 +2,7 @@ package com.qognix.docuflow;
 import android.os.Bundle; import android.widget.*; import androidx.appcompat.app.AppCompatActivity;
 public class ChatActivity extends AppCompatActivity {
   LinearLayout msgs; EditText input; String history="";
-  protected void onCreate(Bundle s){ super.onCreate(s); LinearLayout root=Ui.root(this);
+  protected void onCreate(Bundle s){ super.onCreate(s); Ui.applyTheme(this); Ads.init(this); LinearLayout root=Ui.root(this);
     root.addView(Ui.text(this,"AI Chat",24,Ui.TEXT,true)); root.addView(Ui.text(this,"Chat about: "+Store.docName(this),13,Ui.SUB,false));
     msgs=new LinearLayout(this); msgs.setOrientation(LinearLayout.VERTICAL); root.addView(msgs);
     add("Qognix","Ask me anything about your PDF. With a Gemini key I answer with AI; without one I search the PDF text on-device.");

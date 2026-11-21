@@ -1,11 +1,278 @@
 package com.qognix.docuflow;
-import android.app.Activity; import android.graphics.Color; import android.graphics.drawable.GradientDrawable; import android.view.View; import android.widget.*;
+
+import android.app.Activity;
+import android.content.Context;
+import android.content.Intent;
+import android.graphics.Color;
+import android.graphics.Typeface;
+import android.graphics.drawable.GradientDrawable;
+import android.view.Gravity;
+import android.view.View;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.LinearLayout;
+import android.widget.ScrollView;
+import android.widget.TextView;
+
+// Premium design system for Qognix DocuFlow.
+// Brand palette (user spec): Primary Purple #7654F6, Deep Navy #11182B,
+// Secondary Navy / Card #1B2440, Soft Lavender #B9A8FF, Text #F5F4FA,
+// Secondary text #A7AEC2. Dark is the primary theme; light is optional.
 public class Ui {
-  public static final int NAVY=Color.rgb(11,16,32), CARD=Color.rgb(25,35,61), CARD2=Color.rgb(32,43,73), VIOLET=Color.rgb(118,87,255), LIGHT=Color.rgb(167,139,250), TEXT=Color.rgb(248,250,252), SUB=Color.rgb(167,176,195), BORDER=Color.rgb(41,53,80);
-  public static LinearLayout root(Activity a){ LinearLayout l=new LinearLayout(a); l.setOrientation(LinearLayout.VERTICAL); l.setPadding(36,36,36,36); l.setBackgroundColor(NAVY); return l; }
-  public static ScrollView scroll(Activity a, LinearLayout inner){ ScrollView s=new ScrollView(a); s.setBackgroundColor(NAVY); s.addView(inner); return s; }
-  public static TextView text(Activity a,String t,int sp,int color,boolean bold){ TextView v=new TextView(a); v.setText(t); v.setTextSize(sp); v.setTextColor(color); if(bold) v.setTypeface(android.graphics.Typeface.DEFAULT_BOLD); v.setPadding(0,8,0,8); return v; }
-  public static Button button(Activity a,String t){ Button b=new Button(a); b.setText(t); b.setTextColor(Color.WHITE); b.setAllCaps(false); b.setTextSize(16); GradientDrawable g=new GradientDrawable(); g.setColor(VIOLET); g.setCornerRadius(28); b.setBackground(g); LinearLayout.LayoutParams p=new LinearLayout.LayoutParams(-1,-2); p.setMargins(0,14,0,14); b.setLayoutParams(p); b.setPadding(20,28,20,28); return b; }
-  public static EditText input(Activity a,String hint,boolean multi){ EditText e=new EditText(a); e.setHint(hint); e.setHintTextColor(SUB); e.setTextColor(TEXT); GradientDrawable g=new GradientDrawable(); g.setColor(CARD); g.setCornerRadius(24); g.setStroke(2,BORDER); e.setBackground(g); e.setPadding(28,24,28,24); if(multi){ e.setMinLines(3); e.setGravity(android.view.Gravity.TOP);} LinearLayout.LayoutParams p=new LinearLayout.LayoutParams(-1,-2); p.setMargins(0,12,0,12); e.setLayoutParams(p); return e; }
-  public static void card(Activity a, LinearLayout parent, String heading, String body){ LinearLayout c=new LinearLayout(a); c.setOrientation(LinearLayout.VERTICAL); GradientDrawable g=new GradientDrawable(); g.setColor(CARD); g.setCornerRadius(28); g.setStroke(2,BORDER); c.setBackground(g); c.setPadding(30,24,30,24); LinearLayout.LayoutParams p=new LinearLayout.LayoutParams(-1,-2); p.setMargins(0,14,0,14); c.setLayoutParams(p); c.addView(text(a,heading,17,TEXT,true)); c.addView(text(a,body,14,SUB,false)); parent.addView(c); }
+    public static int NAVY, CARD, CARD2, VIOLET, LIGHT, TEXT, SUB, BORDER;
+    public static boolean dark = true;
+
+    public static void applyTheme(Context c) {
+        dark = !"light".equals(Store.theme(c));
+        if (dark) {
+            NAVY = Color.rgb(17, 24, 43);        // #11182B
+            CARD = Color.rgb(27, 36, 64);        // #1B2440
+            CARD2 = Color.rgb(35, 47, 82);
+            VIOLET = Color.rgb(118, 84, 246);    // #7654F6
+            LIGHT = Color.rgb(185, 168, 255);    // #B9A8FF
+            TEXT = Color.rgb(245, 244, 250);     // #F5F4FA
+            SUB = Color.rgb(167, 174, 194);      // #A7AEC2
+            BORDER = Color.rgb(42, 54, 84);
+        } else {
+            NAVY = Color.rgb(245, 244, 250);
+            CARD = Color.rgb(255, 255, 255);
+            CARD2 = Color.rgb(238, 236, 250);
+            VIOLET = Color.rgb(118, 84, 246);
+            LIGHT = Color.rgb(118, 84, 246);
+            TEXT = Color.rgb(23, 32, 58);
+            SUB = Color.rgb(91, 107, 140);
+            BORDER = Color.rgb(226, 224, 240);
+        }
+    }
+
+    static GradientDrawable bg(int color, int radius, int stroke) {
+        GradientDrawable g = new GradientDrawable();
+        g.setColor(color);
+        g.setCornerRadius(radius);
+        if (stroke > 0) g.setStroke(2, BORDER);
+        return g;
+    }
+
+    public static LinearLayout root(Activity a) {
+        LinearLayout l = new LinearLayout(a);
+        l.setOrientation(LinearLayout.VERTICAL);
+        l.setPadding(36, 36, 36, 36);
+        l.setBackgroundColor(NAVY);
+        return l;
+    }
+
+    public static ScrollView scroll(Activity a, LinearLayout inner) {
+        ScrollView s = new ScrollView(a);
+        s.setBackgroundColor(NAVY);
+        s.addView(inner);
+        return s;
+    }
+
+    public static TextView text(Activity a, String t, int sp, int color, boolean bold) {
+        TextView v = new TextView(a);
+        v.setText(t);
+        v.setTextSize(sp);
+        v.setTextColor(color);
+        if (bold) v.setTypeface(Typeface.DEFAULT_BOLD);
+        v.setPadding(0, 8, 0, 8);
+        v.setLineSpacing(4, 1.08f);
+        return v;
+    }
+
+    public static Button button(Activity a, String t) {
+        Button b = new Button(a);
+        b.setText(t);
+        b.setTextColor(Color.WHITE);
+        b.setAllCaps(false);
+        b.setTextSize(16);
+        b.setBackground(bg(VIOLET, 28, 0));
+        LinearLayout.LayoutParams p = new LinearLayout.LayoutParams(-1, -2);
+        p.setMargins(0, 14, 0, 14);
+        b.setLayoutParams(p);
+        b.setPadding(20, 28, 20, 28);
+        return b;
+    }
+
+    public static Button ghostButton(Activity a, String t) {
+        Button b = new Button(a);
+        b.setText(t);
+        b.setTextColor(TEXT);
+        b.setAllCaps(false);
+        b.setTextSize(15);
+        b.setBackground(bg(CARD, 28, 1));
+        LinearLayout.LayoutParams p = new LinearLayout.LayoutParams(-1, -2);
+        p.setMargins(0, 10, 0, 10);
+        b.setLayoutParams(p);
+        b.setPadding(20, 24, 20, 24);
+        return b;
+    }
+
+    public static EditText input(Activity a, String hint, boolean multi) {
+        EditText e = new EditText(a);
+        e.setHint(hint);
+        e.setHintTextColor(SUB);
+        e.setTextColor(TEXT);
+        e.setBackground(bg(CARD, 24, 1));
+        e.setPadding(28, 24, 28, 24);
+        if (multi) { e.setMinLines(3); e.setGravity(Gravity.TOP); }
+        LinearLayout.LayoutParams p = new LinearLayout.LayoutParams(-1, -2);
+        p.setMargins(0, 12, 0, 12);
+        e.setLayoutParams(p);
+        return e;
+    }
+
+    public static void card(Activity a, LinearLayout parent, String heading, String body) {
+        LinearLayout c = new LinearLayout(a);
+        c.setOrientation(LinearLayout.VERTICAL);
+        c.setBackground(bg(CARD, 28, 1));
+        c.setPadding(30, 24, 30, 24);
+        LinearLayout.LayoutParams p = new LinearLayout.LayoutParams(-1, -2);
+        p.setMargins(0, 14, 0, 14);
+        c.setLayoutParams(p);
+        c.addView(text(a, heading, 17, TEXT, true));
+        c.addView(text(a, body, 14, SUB, false));
+        parent.addView(c);
+    }
+
+    // ---- Premium scaffold: header-less content + banner slot + bottom nav ----
+    public static class Scaffold {
+        public LinearLayout root, content, bannerBox;
+    }
+
+    public static Scaffold scaffold(final Activity a, int activeTab) {
+        applyTheme(a);
+        Scaffold sc = new Scaffold();
+        sc.root = new LinearLayout(a);
+        sc.root.setOrientation(LinearLayout.VERTICAL);
+        sc.root.setBackgroundColor(NAVY);
+        sc.content = root(a);
+        ScrollView sv = new ScrollView(a);
+        sv.setBackgroundColor(NAVY);
+        sv.addView(sc.content);
+        sc.root.addView(sv, new LinearLayout.LayoutParams(-1, 0, 1f));
+        sc.bannerBox = new LinearLayout(a);
+        sc.bannerBox.setOrientation(LinearLayout.VERTICAL);
+        sc.bannerBox.setGravity(Gravity.CENTER);
+        sc.root.addView(sc.bannerBox);
+        sc.root.addView(navBar(a, activeTab));
+        return sc;
+    }
+
+    public static LinearLayout navBar(final Activity a, int activeTab) {
+        LinearLayout nav = new LinearLayout(a);
+        nav.setOrientation(LinearLayout.HORIZONTAL);
+        nav.setBackgroundColor(CARD);
+        nav.setPadding(8, 10, 8, 10);
+        String[] labels = {"Home", "Documents", "History", "Settings"};
+        final Class<?>[] targets = {MainActivity.class, DocumentsActivity.class, HistoryActivity.class, SettingsActivity.class};
+        for (int i = 0; i < labels.length; i++) {
+            final int idx = i;
+            TextView t = new TextView(a);
+            t.setText(labels[i]);
+            t.setTextSize(14);
+            t.setGravity(Gravity.CENTER);
+            t.setPadding(0, 18, 0, 18);
+            if (i == activeTab) {
+                t.setTextColor(Color.WHITE);
+                t.setTypeface(Typeface.DEFAULT_BOLD);
+                t.setBackground(bg(VIOLET, 24, 0));
+            } else {
+                t.setTextColor(SUB);
+            }
+            t.setOnClickListener(v -> {
+                if (idx == activeTab) return;
+                Intent in = new Intent(a, targets[idx]);
+                in.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
+                a.startActivity(in);
+                a.finish();
+            });
+            nav.addView(t, new LinearLayout.LayoutParams(0, -2, 1f));
+        }
+        return nav;
+    }
+
+    // Header used on Home: logo chip + name + tagline + settings shortcut.
+    public static LinearLayout header(final Activity a, boolean showSettings) {
+        LinearLayout h = new LinearLayout(a);
+        h.setOrientation(LinearLayout.HORIZONTAL);
+        h.setGravity(Gravity.CENTER_VERTICAL);
+        TextView logo = new TextView(a);
+        logo.setText("Q");
+        logo.setTextSize(24);
+        logo.setTextColor(Color.WHITE);
+        logo.setTypeface(Typeface.DEFAULT_BOLD);
+        logo.setGravity(Gravity.CENTER);
+        logo.setBackground(bg(VIOLET, 26, 0));
+        h.addView(logo, new LinearLayout.LayoutParams(104, 104));
+        LinearLayout titles = new LinearLayout(a);
+        titles.setOrientation(LinearLayout.VERTICAL);
+        titles.setPadding(26, 0, 0, 0);
+        TextView name = text(a, "Qognix DocuFlow", 21, TEXT, true);
+        name.setPadding(0, 0, 0, 0);
+        TextView tag = text(a, "Your Documents. Smarter with AI.", 13, SUB, false);
+        tag.setPadding(0, 0, 0, 0);
+        titles.addView(name);
+        titles.addView(tag);
+        h.addView(titles, new LinearLayout.LayoutParams(0, -2, 1f));
+        if (showSettings) {
+            TextView gear = new TextView(a);
+            gear.setText("⚙");
+            gear.setTextSize(22);
+            gear.setTextColor(SUB);
+            gear.setGravity(Gravity.CENTER);
+            gear.setPadding(16, 12, 4, 12);
+            gear.setOnClickListener(v -> {
+                Intent in = new Intent(a, SettingsActivity.class);
+                in.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
+                a.startActivity(in);
+                a.finish();
+            });
+            h.addView(gear);
+        }
+        h.setPadding(0, 6, 0, 18);
+        return h;
+    }
+
+    // One AI tool card for the home grid.
+    public static LinearLayout toolCard(Activity a, String chip, String name, String desc, View.OnClickListener click) {
+        LinearLayout c = new LinearLayout(a);
+        c.setOrientation(LinearLayout.VERTICAL);
+        c.setBackground(bg(CARD, 28, 1));
+        c.setPadding(26, 24, 26, 24);
+        TextView ch = new TextView(a);
+        ch.setText(chip);
+        ch.setTextSize(15);
+        ch.setTextColor(Color.WHITE);
+        ch.setTypeface(Typeface.DEFAULT_BOLD);
+        ch.setGravity(Gravity.CENTER);
+        ch.setBackground(bg(VIOLET, 20, 0));
+        c.addView(ch, new LinearLayout.LayoutParams(92, 72));
+        TextView n = text(a, name, 16, TEXT, true);
+        n.setPadding(0, 14, 0, 2);
+        c.addView(n);
+        TextView d = text(a, desc, 13, SUB, false);
+        d.setPadding(0, 0, 0, 0);
+        c.addView(d);
+        c.setOnClickListener(click);
+        return c;
+    }
+
+    // Fresh equal-weight row slot params (never share one instance between views).
+    public static LinearLayout.LayoutParams third() {
+        LinearLayout.LayoutParams p = new LinearLayout.LayoutParams(0, -2, 1f);
+        p.setMargins(4, 4, 4, 4);
+        return p;
+    }
+
+    public static LinearLayout gridRow(Activity a, View left, View right) {
+        LinearLayout row = new LinearLayout(a);
+        row.setOrientation(LinearLayout.HORIZONTAL);
+        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(0, -2, 1f);
+        lp.setMargins(0, 10, 10, 10);
+        row.addView(left, lp);
+        LinearLayout.LayoutParams rp = new LinearLayout.LayoutParams(0, -2, 1f);
+        rp.setMargins(10, 10, 0, 10);
+        if (right != null) row.addView(right, rp); else row.addView(new View(a), rp);
+        return row;
+    }
 }
