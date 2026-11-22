@@ -141,9 +141,11 @@ public class QuizActivity extends AppCompatActivity {
                 answered = true;
                 if (oi == q.answer) {
                     score++;
+                    Sfx.success();
                     ob.setBackground(Ui.bg(Color.rgb(34, 197, 94), 28, 0));
                     ob.setTextColor(Color.WHITE);
                 } else {
+                    Sfx.error();
                     ob.setBackground(Ui.bg(Color.rgb(239, 68, 68), 28, 0));
                     ob.setTextColor(Color.WHITE);
                 }

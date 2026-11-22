@@ -169,8 +169,22 @@ public class Ui {
         return v;
     }
 
+    // A button that plays the soft tap sound with every click, so all
+    // buttons in the app feel alive without each screen wiring it up.
+    static Button popButton(Activity a) {
+        return new Button(a) {
+            @Override
+            public void setOnClickListener(View.OnClickListener l) {
+                super.setOnClickListener(v -> {
+                    Sfx.pop();
+                    if (l != null) l.onClick(v);
+                });
+            }
+        };
+    }
+
     public static Button button(Activity a, String t) {
-        Button b = new Button(a);
+        Button b = popButton(a);
         b.setText(t);
         b.setTextColor(Color.WHITE);
         b.setAllCaps(false);
@@ -184,7 +198,7 @@ public class Ui {
     }
 
     public static Button ghostButton(Activity a, String t) {
-        Button b = new Button(a);
+        Button b = popButton(a);
         b.setText(t);
         b.setTextColor(TEXT);
         b.setAllCaps(false);
@@ -362,7 +376,7 @@ public class Ui {
         TextView d = text(a, desc, 13, SUB, false);
         d.setPadding(0, 0, 0, 0);
         c.addView(d);
-        c.setOnClickListener(click);
+        c.setOnClickListener(v -> { Sfx.pop(); click.onClick(v); });
         return c;
     }
 
