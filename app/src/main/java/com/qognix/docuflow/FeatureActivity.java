@@ -196,7 +196,18 @@ public class FeatureActivity extends AppCompatActivity {
             finishWith(local(doc, q), "On-device mode");
             return;
         }
-        String snippet = doc.length() > 12000 ? doc.substring(0, 12000) : doc;
+        if (mode.equals("ask")) {
+            int ref = PageText.pageRef(q);
+            int total = PageText.totalPages(doc);
+            if (ref > 0 && total > 0 && ref > total) {
+                finishWith(PageText.outOfRangeMessage(ref, total), "On-device");
+                return;
+            }
+        }
+        String snippet = mode.equals("ask")
+                ? PageText.contextFor(doc, q, 250000)
+                : (doc.length() > 60000 ? doc.substring(0, 60000) : doc);
+        if (snippet == null) snippet = "";
         String prompt = promptFor(snippet, q, target);
         GeminiClient.generate(key, prompt, new GeminiClient.Cb() {
             @Override
@@ -230,7 +241,7 @@ public class FeatureActivity extends AppCompatActivity {
             case "mcq":
                 return "Make 10 multiple-choice questions from this document. For each: the question, 4 options labelled A) B) C) D), the correct answer, and one line explaining why it is correct. Base everything only on the document.\n\nDocument:\n" + snippet;
             case "ask":
-                return "Answer this question using ONLY this document. The document has [Page N] markers — cite the page like (Page 3) for each fact you use. If the document does not contain the answer, say so clearly instead of guessing.\n\nQuestion: " + q + "\n\nDocument:\n" + snippet;
+                return "Answer this question using ONLY this document. The document has [Page N] markers — cite the page like (Page 3) for each fact you use. Ignore any website names, watermarks or page headers in the text and never mention them. If the document does not contain the answer, say so clearly instead of guessing.\n\nQuestion: " + q + "\n\nDocument:\n" + snippet;
             case "translate":
                 return "Translate this document text into " + target + ". Keep the headings and paragraph structure. Translate faithfully, do not summarize.\n\nDocument:\n" + snippet;
             case "points":

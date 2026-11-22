@@ -240,6 +240,18 @@ public class LocalTools {
 
     public static String ask(String t, String q) {
         if (q == null || q.trim().isEmpty()) return "Type a question first.";
+        // Direct page requests ("page no 86", "safha 86") get that page's text.
+        int ref = PageText.pageRef(q);
+        if (ref > 0) {
+            int total = PageText.totalPages(t);
+            if (total > 0 && ref > total) return PageText.outOfRangeMessage(ref, total);
+            String pc = PageText.pageContent(t, ref);
+            if (pc != null && !pc.trim().isEmpty()) {
+                String trimmed = pc.trim();
+                if (trimmed.length() > 1800) trimmed = trimmed.substring(0, 1800) + "…";
+                return "Here is what page " + ref + " of your PDF says:\n\n" + trimmed;
+            }
+        }
         String[] qw = q.toLowerCase().split("\\W+");
         // Search page by page so we can cite the page number.
         String[] sections = t.split("\\[Page ");

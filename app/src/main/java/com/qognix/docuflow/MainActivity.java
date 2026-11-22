@@ -135,7 +135,7 @@ public class MainActivity extends AppCompatActivity {
         bell.setImageResource(R.drawable.img_bell);
         bell.setOnClickListener(v -> new AlertDialog.Builder(MainActivity.this)
                 .setTitle("Notifications")
-                .setMessage("You are all caught up.\n\nQognix DocuFlow v3.3 — premium design, 10 AI tools, interactive quiz and history.")
+                .setMessage("You are all caught up.\n\nQognix DocuFlow v3.4 — premium design, 10 AI tools, interactive quiz and history.")
                 .setPositiveButton("OK", null)
                 .show());
         h.addView(bell, new LinearLayout.LayoutParams(118, 118));
