@@ -47,11 +47,14 @@ public class Ads {
     private static final long INTERSTITIAL_CAP_MS = 150000; // at most one per 2.5 minutes
 
     private static boolean inited = false;
+    private static boolean sdkReady = false;
     private static StartAppAd interstitial = null;
     private static boolean interstitialReady = false;
     private static long lastInterstitialShown = 0;
     private static StartAppAd rewarded = null;
     private static boolean rewardedReady = false;
+    private static int rewardedRetries = 0;
+    private static boolean rewardedRetryScheduled = false;
 
     public static void init(Context c) {
         if (inited) return;
@@ -61,7 +64,12 @@ public class Ads {
                     .setReturnAdsEnabled(false)
                     .setCallback(new Runnable() {
                         @Override
-                        public void run() { }
+                        public void run() {
+                            // SDK finished initializing — now ad loads are
+                            // reliable. Fire the queued launch ad, if any.
+                            sdkReady = true;
+                            if (launchRequested && launchHost != null) doLaunch(launchHost);
+                        }
                     })
                     .init();
             boolean debuggable = (c.getApplicationInfo().flags & ApplicationInfo.FLAG_DEBUGGABLE) != 0;
@@ -142,12 +150,35 @@ public class Ads {
     }
 
     // ---- Launch ad (one interstitial when the app opens; user request) ----
+    // v3.5: the load waits for the SDK-ready callback (loading earlier can
+    // fail silently), with a timed fallback and one retry, so the launch
+    // ad actually appears whenever Start.io has one to show.
     private static boolean launchAdShown = false;
+    private static boolean launchRequested = false;
+    private static boolean launchStarted = false;
+    private static boolean launchRetried = false;
+    private static Activity launchHost = null;
     private static StartAppAd launchAd = null;
 
     public static void showLaunchAd(final Activity a) {
         if (launchAdShown) return;
         launchAdShown = true;
+        launchRequested = true;
+        launchHost = a;
+        if (sdkReady) {
+            doLaunch(a);
+        } else {
+            // Fallback: if the init callback is slow, try anyway after 4s.
+            new Handler(Looper.getMainLooper()).postDelayed(new Runnable() {
+                @Override
+                public void run() { if (!launchStarted && !a.isFinishing()) doLaunch(a); }
+            }, 4000);
+        }
+    }
+
+    private static void doLaunch(final Activity a) {
+        if (launchStarted) return;
+        launchStarted = true;
         try {
             launchAd = new StartAppAd(a);
             launchAd.loadAd(new AdEventListener() {
@@ -162,22 +193,51 @@ public class Ads {
                 }
 
                 @Override
-                public void onFailedToReceiveAd(@Nullable Ad ad) { }
+                public void onFailedToReceiveAd(@Nullable Ad ad) {
+                    if (!launchRetried) {
+                        launchRetried = true;
+                        launchStarted = false;
+                        new Handler(Looper.getMainLooper()).postDelayed(new Runnable() {
+                            @Override
+                            public void run() { if (!a.isFinishing() && !a.isDestroyed()) doLaunch(a); }
+                        }, 8000);
+                    }
+                }
             });
         } catch (Throwable ignored) { }
     }
 
     // ---- Rewarded video (explicit user choice only) ----
-    public static void preloadRewarded(Activity a) {
+    public static void preloadRewarded(final Activity a) {
         try {
             rewardedReady = false;
             rewarded = new StartAppAd(a);
             rewarded.loadAd(StartAppAd.AdMode.REWARDED_VIDEO, new AdEventListener() {
                 @Override
-                public void onReceiveAd(@NonNull Ad ad) { rewardedReady = true; }
+                public void onReceiveAd(@NonNull Ad ad) {
+                    rewardedReady = true;
+                    rewardedRetries = 0;
+                }
 
                 @Override
-                public void onFailedToReceiveAd(@Nullable Ad ad) { rewardedReady = false; }
+                public void onFailedToReceiveAd(@Nullable Ad ad) {
+                    rewardedReady = false;
+                    // Retry a few times with growing delays — a single failed
+                    // load (SDK warming up / momentary no-fill) should not
+                    // leave the button dead for the whole session.
+                    if (rewardedRetries < 3 && !rewardedRetryScheduled) {
+                        rewardedRetryScheduled = true;
+                        long delay = rewardedRetries == 0 ? 5000 : rewardedRetries == 1 ? 15000 : 30000;
+                        rewardedRetries++;
+                        new Handler(Looper.getMainLooper()).postDelayed(new Runnable() {
+                            @Override
+                            public void run() {
+                                rewardedRetryScheduled = false;
+                                if (!a.isFinishing()) preloadRewarded(a);
+                            }
+                        }, delay);
+                    }
+                }
             });
         } catch (Throwable e) {
             rewardedReady = false;

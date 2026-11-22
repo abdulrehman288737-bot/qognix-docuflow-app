@@ -99,7 +99,7 @@ public class MainActivity extends AppCompatActivity {
                         : "Your key is saved on this phone only. Manage or test it in Settings.");
 
         Button watch = Ui.ghostButton(this, "Watch a video ad (optional, supports Qognix)");
-        watch.setOnClickListener(v -> { if (!Ads.showRewarded(this)) toast("Video ad is still loading — try again in a few seconds"); });
+        watch.setOnClickListener(v -> { if (!Ads.showRewarded(this)) toast("No video ad available right now — Start.io has no ad to show at the moment. Please try again later."); });
         root.addView(watch);
         Ads.preloadRewarded(this);
 
@@ -135,7 +135,7 @@ public class MainActivity extends AppCompatActivity {
         bell.setImageResource(R.drawable.img_bell);
         bell.setOnClickListener(v -> new AlertDialog.Builder(MainActivity.this)
                 .setTitle("Notifications")
-                .setMessage("You are all caught up.\n\nQognix DocuFlow v3.4 — premium design, 10 AI tools, interactive quiz and history.")
+                .setMessage("You are all caught up.\n\nQognix DocuFlow v3.5 — premium design, 10 AI tools, interactive quiz and history.")
                 .setPositiveButton("OK", null)
                 .show());
         h.addView(bell, new LinearLayout.LayoutParams(118, 118));
